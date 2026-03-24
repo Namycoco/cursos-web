@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestión de Alumnos</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+/* FUENTES Y FONDO */
+body {
+    font-family:'Poppins', sans-serif;
+    margin:0;
+    background:linear-gradient(135deg,#fff0f5,#ffe6f2);
+}
+
+/* MENÚ SUPERIOR */
+.menu {
+    width: 100%;
+    background: linear-gradient(90deg,#f4a8c2,#d6619f,#f4a8c2);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    position: sticky; 
+    top: 0;
+    z-index: 1000;
+}
+
+.menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+}
+
+.menu ul li {
+    margin: 0 15px;
+}
+
+.menu ul li a {
+    display: block;
+    padding: 15px 20px;
+    color: white;
+    font-weight: bold;
+    text-decoration: none;
+    transition: 0.3s;
+    font-family: 'Poppins', sans-serif;
+}
+
+.menu ul li a:hover {
+    background-color: rgba(255,255,255,0.2);
+    border-radius: 8px;
+}
+
+/* TÍTULO */
+h1 {
+    text-align:center;
+    background:linear-gradient(90deg,#f4a8c2,#d6619f,#f4a8c2);
+    color:white;
+    padding:20px;
+    margin:0;
+}
+
+/* LAYOUT */
+.container {
+    display:flex;
+    gap:30px;
+    padding:30px;
+}
+
+/* PANEL IZQUIERDO */
+.panel {
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+}
+
+/* RESULTADOS DERECHA */
+.resultados {
+    flex:2;
+    background:white;
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.15);
+}
+
+/* TARJETAS */
+.card {
+    background:white;
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.15);
+}
+
+h2 {
+    margin-top:0;
+    color:#d6619f;
+}
+
+/* INPUTS */
+input[type="text"] {
+    width:100%;
+    padding:8px;
+    margin-top:5px;
+    margin-bottom:10px;
+    border-radius:8px;
+    border:1px solid #f4a8c2;
+}
+
+/* BOTONES */
+button,input[type="submit"] {
+    background:linear-gradient(90deg,#f4a8c2,#d6619f,#f4a8c2);
+    border:none;
+    color:white;
+    padding:10px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:bold;
+    transition:0.3s;
+}
+
+button:hover,input[type="submit"]:hover {
+    transform:scale(1.05);
+}
+
+/* TABLA DE RESULTADOS */
+table {
+    width:100%;
+    border-collapse:collapse;
+    margin-top:10px;
+}
+
+th {
+    background:#f4a8c2;
+    color:white;
+    padding:10px;
+}
+
+td {
+    padding:10px;
+    border-bottom:1px solid #ffe6f2;
+}
+
+tr:hover {
+    background:#ffe6f2;
+}
+</style>
+
+<script>
+// Mostrar resultados en tabla
+function mostrarAlumnosTabla(alumnos){
+    let tabla = `
+    <table>
+    <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Apellidos</th>
+        <th>Dirección</th>
+        <th>Ciudad</th>
+    </tr>
+    `;
+    alumnos.forEach(a=>{
+        tabla += `
+        <tr>
+            <td>${a.id}</td>
+            <td>${a.nombre}</td>
+            <td>${a.apellidos}</td>
+            <td>${a.direccion}</td>
+            <td>${a.ciudad}</td>
+        </tr>
+        `;
+    });
+    tabla += "</table>";
+    document.getElementById("resultado").innerHTML = tabla;
+}
+
+// Obtener todos los alumnos
+async function obtenerAlumnos(){
+    const response = await fetch('http://localhost:60941/api/alumno');
+    const data = await response.json();
+    mostrarAlumnosTabla(data);
+}
+
+// Obtener alumno por ID
+async function obtenerAlumnoPorId(){
+    const id = document.getElementById('alumnoId').value;
+    const response = await fetch('http://localhost:60941/api/alumno/' + id);
+    const data = await response.json();
+    mostrarAlumnosTabla([data]);
+}
+
+// Guardar nuevo alumno
+async function guardarAlumno(){
+    const nombre = document.getElementById('nombre').value;
+    const apellidos = document.getElementById('apellidos').value;
+    const direccion = document.getElementById('direccion').value;
+    const ciudad = document.getElementById('ciudad').value;
+
+    const response = await fetch('http://localhost:60941/api/alumno',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({nombre, apellidos, direccion, ciudad})
+    });
+
+    await response.json();
+    alert("Alumno guardado correctamente");
+    obtenerAlumnos();
+}
+
+// Eliminar alumno
+async function eliminarAlumno(){
+    const id = document.getElementById('alumnoIdEliminar').value;
+    await fetch('http://localhost:9090/api/alumnos/' + id, {method:'DELETE'});
+    alert("Alumno eliminado");
+    obtenerAlumnos();
+}
+</script>
+
+</head>
+<body>
+
+		<!-- Este código va al inicio del <body> de cada página -->
+		<nav class="menu">
+		    <ul>
+		        <li><a href="Cursos.html">Cursos</a></li>
+		        <li><a href="Alumnos.html">Alumnos</a></li>
+		        <li><a href="Profesores.html">Profesores</a></li>
+		    </ul>
+		</nav>
+
+		<style>
+		/* Estilo del menú superior */
+		.menu {
+		    width: 100%;
+		    background: linear-gradient(90deg, #555555, #888888, #aaaaaa);
+		    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+		    position: sticky; /* Fija el menú al hacer scroll */
+		    top: 0;
+		    z-index: 1000;
+		}
+
+		.menu ul {
+		    list-style: none;
+		    margin: 0;
+		    padding: 0;
+		    display: flex;
+		    justify-content: center;
+		}
+
+		.menu ul li {
+		    margin: 0 15px;
+		}
+
+		.menu ul li a {
+		    display: block;
+		    padding: 15px 20px;
+		    color: white;
+		    font-weight: bold;
+		    text-decoration: none;
+		    transition: 0.3s;
+		    font-family: 'Poppins', sans-serif;
+		}
+
+		.menu ul li a:hover {
+		    background-color: rgba(255,255,255,0.2);
+		    border-radius: 8px;
+		}
+		</style>
+<h1>Gestión de Alumnos</h1>
+
+<div class="container">
+
+    <!-- PANEL IZQUIERDO -->
+    <div class="panel">
+
+        <div class="card">
+            <h2>Ver todos los alumnos</h2>
+            <button onclick="obtenerAlumnos()">Mostrar todos</button>
+        </div>
+
+        <div class="card">
+            <h2>Buscar alumno</h2>
+            <input type="text" id="alumnoId" placeholder="ID del Alumno">
+            <button onclick="obtenerAlumnoPorId()">Buscar</button>
+        </div>
+
+        <div class="card">
+            <h2>Nuevo alumno</h2>
+            <form onsubmit="event.preventDefault(); guardarAlumno();">
+                <input type="text" id="nombre" placeholder="Nombre">
+                <input type="text" id="apellidos" placeholder="Apellidos">
+                <input type="text" id="direccion" placeholder="Dirección">
+                <input type="text" id="ciudad" placeholder="Ciudad">
+                <input type="submit" value="Guardar Alumno">
+            </form>
+        </div>
+
+        <div class="card">
+            <h2>Eliminar alumno</h2>
+            <input type="text" id="alumnoIdEliminar" placeholder="ID del Alumno">
+            <button onclick="eliminarAlumno()">Eliminar</button>
+        </div>
+
+    </div>
+
+    <!-- RESULTADOS DERECHA -->
+    <div class="resultados">
+        <h2>Resultados</h2>
+        <div id="resultado">Pulsa "Mostrar todos" para ver los alumnos.</div>
+    </div>
+
+</div>
+
+</body>
+</html>
